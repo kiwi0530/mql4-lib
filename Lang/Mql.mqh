@@ -20,7 +20,15 @@
 //| See the License for the specific language governing permissions  |
 //| and limitations under the License.                               |
 //+------------------------------------------------------------------+
+#ifdef __MQLBUILD__
 #property strict
+#else
+#include <Mql/Lang/Mql4Syntax.mqh>
+#endif
+
+#ifndef __MQL_MQH__
+#define __MQL_MQH__
+
 #include "Error.mqh"
 #include <WinUser32.mqh>
 #include <stdlib.mqh>
@@ -111,7 +119,7 @@ public:
  * @brief Macro to create property in class
  *
  */
-#define NODE_PROPERTY(arg_type, arg_name)                            \
+#define MQL_PROPERTY(arg_type, arg_name)                             \
 public:                                                              \
 	arg_type get_##arg_name() const { return prop_##arg_name; }      \
 	void set_##arg_name(arg_type value) { prop_##arg_name = value; } \
@@ -119,21 +127,21 @@ public:                                                              \
 protected:                                                           \
 	arg_type prop_##arg_name
 
-#define NODE_PROPERTY_GET(arg_type, arg_name)                   \
+#define MQL_PROPERTY_GET(arg_type, arg_name)                    \
 public:                                                         \
 	arg_type get_##arg_name() const { return prop_##arg_name; } \
                                                                 \
 protected:                                                      \
 	arg_type prop_##arg_name
 
-#define NODE_PROPERTY_SET(arg_type, arg_name)                        \
+#define MQL_PROPERTY_SET(arg_type, arg_name)                         \
 public:                                                              \
 	void set_##arg_name(arg_type value) { prop_##arg_name = value; } \
                                                                      \
 protected:                                                           \
 	arg_type prop_##arg_name
 
-#define NODE_BOOLPROPERTY(arg_name)                                \
+#define MQL_BOOLPROPERTY(arg_name)                                 \
 public:                                                            \
 	bool is_##arg_name() const { return prop_is##arg_name; }       \
 	void set_##arg_name(bool value) { prop_is##arg_name = value; } \
@@ -141,14 +149,14 @@ public:                                                            \
 protected:                                                         \
 	bool prop_is##arg_name
 
-#define NODE_BOOLPROPERTY_GET(arg_name)                      \
+#define MQL_BOOLPROPERTY_GET(arg_name)                       \
 public:                                                      \
 	bool is_##arg_name() const { return prop_is##arg_name; } \
                                                              \
 protected:                                                   \
 	bool prop_is##arg_name
 
-#define NODE_BOOLPROPERTY_SET(arg_name)                            \
+#define MQL_BOOLPROPERTY_SET(arg_name)                             \
 public:                                                            \
 	void set_##arg_name(bool value) { prop_is##arg_name = value; } \
                                                                    \
@@ -230,3 +238,5 @@ private:                                                   \
 // 	}                     \
 // 	__execute##Name;
 //+------------------------------------------------------------------+
+
+#endif	//__MQL_MQH__

@@ -1,3 +1,5 @@
+/*
+ */
 //+------------------------------------------------------------------+
 //| Module: Lang/Event.mqh                                           |
 //| This file is part of the mql4-lib project:                       |
@@ -68,39 +70,36 @@ send custom events.
 */
 
 #property strict
-#include "Number.mqh" // for SHORT_BITS
+#include "Number.mqh"  // for SHORT_BITS
 //+------------------------------------------------------------------+
 //| Encode AppEvent parameters to PostMessage parameters             |
 //| This should not be used in mt4 programs, only as reference for   |
 //| other languages.                                                 |
 //+------------------------------------------------------------------+
-void EncodeKeydownMessage(const ushort event,const uint param,int &wparam,int &lparam)
-  {
-   uint t=(uint)event;
-   t<<= SHORT_BITS;
-   t |= 0x80000000;
-   uint highPart= param & 0xFFFF0000;
-   uint lowPart = param & 0x0000FFFF;
-   wparam = (int)(t|(highPart>>SHORT_BITS));
-   lparam = (int)lowPart;
-  }
+void EncodeKeydownMessage(const ushort event, const uint param, int &wparam, int &lparam) {
+	uint t = (uint)event;
+	t <<= SHORT_BITS;
+	t |= 0x80000000;
+	uint highPart = param & 0xFFFF0000;
+	uint lowPart = param & 0x0000FFFF;
+	wparam = (int)(t | (highPart >> SHORT_BITS));
+	lparam = (int)lowPart;
+}
 //+------------------------------------------------------------------+
 //| Check if the OnChartEvent parameter lparam is a special keydown  |
 //+------------------------------------------------------------------+
-bool IsKeydownMessage(const long lparam)
-  {
-   return (((uint)lparam)&0x80000000) != 0;
-  }
+bool IsKeydownMessage(const long lparam) {
+	return (((uint)lparam) & 0x80000000) != 0;
+}
 //+------------------------------------------------------------------+
 //| Decode OnChartEvent paramters to AppEvent parameters             |
 //+------------------------------------------------------------------+
-void DecodeKeydownMessage(const long lparam,const double dparam,ushort &event,uint &param)
-  {
-   uint t=((uint)lparam)&(~0x80000000);
-   event=(ushort)((t&0xFFFF0000)>>SHORT_BITS);
+void DecodeKeydownMessage(const long lparam, const double dparam, ushort &event, uint &param) {
+	uint t = ((uint)lparam) & (~0x80000000);
+	event = (ushort)((t & 0xFFFF0000) >> SHORT_BITS);
 
-   uint highPart=(t&0x0000FFFF)<<SHORT_BITS;
-   uint lowPart=(uint)dparam;
-   param=highPart|lowPart;
-  }
+	uint highPart = (t & 0x0000FFFF) << SHORT_BITS;
+	uint lowPart = (uint)dparam;
+	param = highPart | lowPart;
+}
 //+------------------------------------------------------------------+

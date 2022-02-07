@@ -1,3 +1,5 @@
+/*
+ */
 //+------------------------------------------------------------------+
 //| Module: Lang/ExpertAdvisor.mqh                                   |
 //| This file is part of the mql4-lib project:                       |
@@ -18,22 +20,30 @@
 //| See the License for the specific language governing permissions  |
 //| and limitations under the License.                               |
 //+------------------------------------------------------------------+
+#ifdef __MQLBUILD__
 #property strict
+#else
+#include <Mql/Lang/Mql4Syntax.mqh>
+#endif
+
+#ifndef __EXPERTADVISOR_MQH__
+#define __EXPERTADVISOR_MQH__
 
 #include "EventApp.mqh"
 
-#define DECLARE_EA(AppClass,Boolean) \
-DECLARE_EVENT_APP(AppClass,Boolean)\
-double OnTester() {return dynamic_cast<ExpertAdvisor*>(App::Global).onTester();}\
-void OnTick() {dynamic_cast<ExpertAdvisor*>(App::Global).main();}
+#define DECLARE_EA(_apptype)    \
+	DECLARE_EVENT_APP(_apptype) \
+	// double OnTester() { return dynamic_cast<ExpertAdvisor*>(App::current_app).onTester(); } \
+	void OnTick() { dynamic_cast<ExpertAdvisor*>(App::current_app).main(); }
 //+------------------------------------------------------------------+
 //| Abstract base class for a MQL Expert Advisor                     |
 //+------------------------------------------------------------------+
-class ExpertAdvisor: public EventApp
-  {
+class ExpertAdvisor : public EventApp {
 public:
-   virtual void      main() {}
-   //--- default for EA Tester
-   virtual double    onTester() {return 0.0;}
-  };
+	virtual void main() {}
+	//--- default for EA Tester
+	// virtual double onTester() { return 1000.0; }
+};
 //+------------------------------------------------------------------+
+
+#endif	//__EXPERTADVISOR_MQH__

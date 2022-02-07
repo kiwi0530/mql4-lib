@@ -1,3 +1,5 @@
+/*
+ */
 //+------------------------------------------------------------------+
 //| Module: Lang/Pointer.mqh                                         |
 //| This file is part of the mql4-lib project:                       |
@@ -19,42 +21,45 @@
 //| and limitations under the License.                               |
 //+------------------------------------------------------------------+
 #property strict
+
+#ifndef LANGPOINTER_MQH
+#define LANGPOINTER_MQH
 //+------------------------------------------------------------------+
 //| Generic pointer check                                            |
 //+------------------------------------------------------------------+
-template<typename T>
-bool IsValid(T *pointer)
-  {
-   return CheckPointer(pointer)!=POINTER_INVALID;
-  }
+template <typename T>
+bool IsValid(T *pointer) {
+	return CheckPointer(pointer) != POINTER_INVALID;
+}
 //+------------------------------------------------------------------+
 //| Generic safe pointer delete                                      |
 //+------------------------------------------------------------------+
-template<typename T>
-void SafeDelete(T *pointer)
-  {
-//--- only dynamically created value with `new` should be deleted
-//--- automatic pointers from GetPointer (POINTER_AUTOMATIC) should not be deleted
-   if(CheckPointer(pointer)==POINTER_DYNAMIC) delete pointer;
-  }
+template <typename T>
+void SafeDelete(T *pointer) {
+	//--- only dynamically created value with `new` should be deleted
+	//--- automatic pointers from GetPointer (POINTER_AUTOMATIC) should not be deleted
+	if (CheckPointer(pointer) == POINTER_DYNAMIC) delete pointer;
+}
 //+------------------------------------------------------------------+
 //| If pointer is actually a value type                              |
 //+------------------------------------------------------------------+
-template<typename T>
+template <typename T>
 void SafeDelete(T pointer) {}
 //+------------------------------------------------------------------+
 //| Ensure dynamic global pointers be deleted after program exit     |
 //| In global context, declare the following (p is some pointer):    |
 //|     EnsureDelete ensureDeleteSomething(p);                       |
 //+------------------------------------------------------------------+
-class EnsureDelete
-  {
+class EnsureDelete {
 private:
-   const void       *m_pointer;
+	const void *m_pointer;
+
 public:
-                     EnsureDelete(const void *p):m_pointer(p){}
-                    ~EnsureDelete() {if(CheckPointer(m_pointer)==POINTER_DYNAMIC) delete m_pointer;}
-  };
+	EnsureDelete(const void *p) : m_pointer(p) {}
+	~EnsureDelete() {
+		if (CheckPointer(m_pointer) == POINTER_DYNAMIC) delete m_pointer;
+	}
+};
 //+------------------------------------------------------------------+
 //| Get numerical value of a pointer                                 |
 //| Mainly used by the Hash function on pointers                     |
@@ -62,41 +67,46 @@ public:
 //| value, not the actual pointer address of objects.                |
 //| But numeric values of different pointers have to be distinct.    |
 //+------------------------------------------------------------------+
-long GetAddress(const void *pointer)
-  {
-   return long(StringFormat("%I64d",pointer));
-  }
+long GetAddress(const void *pointer) {
+	return long(StringFormat("%I64d", pointer));
+}
 //+------------------------------------------------------------------+
 //| Wraps a pointer that does not own the underlying resource        |
 //+------------------------------------------------------------------+
-template<typename T>
-class Ref
-  {
+template <typename T>
+class Ref {
 public:
-   T                *r;
-                     Ref(T *raw=NULL):r(raw) {}
-                     Ref(const Ref<T>&other):r(other.r) {}
-   virtual          ~Ref() {}
+	T *r;
+	Ref(T *raw = NULL) : r(raw) {}
+	Ref(const Ref<T> &other) : r(other.r) {}
+	virtual ~Ref() {}
 
-   bool              operator==(const Ref &other) const {return other.r==r;}
-   bool              operator==(const T *other) const {return r==other;}
-   bool              operator!=(const Ref &other) const {return other.r!=r;}
-   bool              operator!=(const T *other) const {return r!=other;}
+	bool operator==(const Ref &other) const { return other.r == r; }
+	bool operator==(const T *other) const { return r == other; }
+	bool operator!=(const Ref &other) const { return other.r != r; }
+	bool operator!=(const T *other) const { return r != other; }
 
-   virtual T        *operator=(Ref &other) {r=other.r;return r;}
-   T                *operator=(T *other){ r=other;return r;}
-  };
+	virtual T *operator=(Ref &other) {
+		r = other.r;
+		return r;
+	}
+	T *operator=(T *other) {
+		r = other;
+		return r;
+	}
+};
 //+------------------------------------------------------------------+
 //| Wraps a pointer that owns the underlying resource                |
 //+------------------------------------------------------------------+
-template<typename T>
-class Ptr: public Ref<T>
-  {
+template <typename T>
+class Ptr : public Ref<T> {
 public:
-                     Ptr(T *raw=NULL):Ref(raw) {}
-                     Ptr(const Ptr<T>&other):Ref(other) {}
+	Ptr(T *raw = NULL) : Ref(raw) {}
+	Ptr(const Ptr<T> &other) : Ref(other) {}
 
-   //--- responsible for delete the resource
-                    ~Ptr() {SafeDelete(r);}
-  };
+	//--- responsible for delete the resource
+	~Ptr() { SafeDelete(r); }
+};
 //+------------------------------------------------------------------+
+
+#endif

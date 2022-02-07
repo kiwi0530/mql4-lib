@@ -1,3 +1,5 @@
+/*
+ */
 //+------------------------------------------------------------------+
 //| Module: Collection/EqualityComparer.mqh                          |
 //| This file is part of the mql4-lib project:                       |
@@ -18,25 +20,34 @@
 //| See the License for the specific language governing permissions  |
 //| and limitations under the License.                               |
 //+------------------------------------------------------------------+
-#include "../Lang/Hash.mqh"
+
+#ifdef __MQLBUILD__
 #property strict
+#else
+#include <Mql/Lang/Mql4Syntax.mqh>
+#endif
+
+#ifndef __EQUALITYCOMPARER_MQH__
+#define __EQUALITYCOMPARER_MQH__
+
+#include "../Lang/Hash.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-template<typename T>
-interface EqualityComparer
-  {
-   bool      equals(const T left,const T right) const;
-   int       hash(const T value) const;
-  };
+template <typename T>
+interface EqualityComparer {
+	bool equals(const T left, const T right) const;
+	int hash(const T value) const;
+};
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-template<typename T>
-class GenericEqualityComparer: public EqualityComparer<T>
-  {
+template <typename T>
+class GenericEqualityComparer : public EqualityComparer<T> {
 public:
-   virtual bool       equals(const T left,const T right) const override {return left==right;}
-   virtual int        hash(const T value) const override {return Hash(value);}
-  };
+	virtual bool equals(const T left, const T right) const override { return left == right; }
+	virtual int hash(const T value) const override { return Hash(value); }
+};
 //+------------------------------------------------------------------+
+
+#endif	// __EQUALITYCOMPARER_MQH__

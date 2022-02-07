@@ -1,3 +1,5 @@
+/*
+ */
 //+------------------------------------------------------------------+
 //| Module: Lang/Script.mqh                                          |
 //| This file is part of the mql4-lib project:                       |
@@ -22,15 +24,14 @@
 
 #include "App.mqh"
 
-#define DECLARE_SCRIPT(AppClass,Boolean) \
-DECLARE_APP(AppClass,Boolean)\
-void OnStart() {dynamic_cast<Script*>(App::Global).main();}
+#define DECLARE_SCRIPT(_apptype) \
+	DECLARE_APP(_apptype)        \
+	void OnStart() { dynamic_cast<Script*>(App::app).main(); }
 //+------------------------------------------------------------------+
 //| Base class for a MQL Script                                      |
 //+------------------------------------------------------------------+
-class Script: public App
-  {
+class Script : public App {
 public:
-   virtual void      main(void)=0;
-  };
+	virtual void main(void) = 0;
+};
 //+------------------------------------------------------------------+

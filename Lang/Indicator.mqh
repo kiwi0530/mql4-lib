@@ -1,3 +1,5 @@
+/*
+ */
 //+------------------------------------------------------------------+
 //| Module: Lang/Indicator.mqh                                       |
 //| This file is part of the mql4-lib project:                       |
@@ -18,30 +20,36 @@
 //| See the License for the specific language governing permissions  |
 //| and limitations under the License.                               |
 //+------------------------------------------------------------------+
+#ifdef __MQLBUILD__
 #property strict
+#else
+#include <Mql/Lang/Mql4Syntax.mqh>
+#endif
+
+#ifndef __INDICATOR_MQH__
+#define __INDICATOR_MQH__
 
 #include "EventApp.mqh"
 
-#define DECLARE_INDICATOR(AppClass,Boolean) \
-DECLARE_EVENT_APP(AppClass,Boolean)\
-int OnCalculate(const int rates_total,const int prev_calculated,const datetime &time[],const double &open[],const double &high[],const double &low[],const double &close[],const long &tickVolume[],const long &volume[],const int &spread[])\
-  {return dynamic_cast<Indicator*>(App::Global).main(rates_total,prev_calculated,time,open,high,low,close,tickVolume,volume,spread);}
+#define DECLARE_INDICATOR(_apptype) \
+	DECLARE_EVENT_APP(_apptype)     \
+	int OnCalculate(const int rates_total, const int prev_calculated, const datetime &time[], const double &open[], const double &high[], const double &low[], const double &close[], const long &tickVolume[], const long &volume[], const int &spread[]) { return dynamic_cast<Indicator *>(App::app).main(rates_total, prev_calculated, time, open, high, low, close, tickVolume, volume, spread); }
 //+------------------------------------------------------------------+
 //| Base class for a MQL Indicator                                   |
 //+------------------------------------------------------------------+
-class Indicator: public EventApp
-  {
+class Indicator : public EventApp {
 public:
-   virtual int       main(const int total,
-                          const int prev,
-                          const datetime &time[],
-                          const double &open[],
-                          const double &high[],
-                          const double &low[],
-                          const double &close[],
-                          const long &tickVolume[],
-                          const long &volume[],
-                          const int &spread[])
-     {return total;}
-  };
+	virtual int main(const int total,
+					 const int prev,
+					 const datetime &time[],
+					 const double &open[],
+					 const double &high[],
+					 const double &low[],
+					 const double &close[],
+					 const long &tickVolume[],
+					 const long &volume[],
+					 const int &spread[]) { return total; }
+};
 //+------------------------------------------------------------------+
+
+#endif	// __INDICATOR_MQH__

@@ -20,7 +20,14 @@
 //| See the License for the specific language governing permissions  |
 //| and limitations under the License.                               |
 //+------------------------------------------------------------------+
+#ifdef __MQLBUILD__
 #property strict
+#else
+#include <Mql/Lang/Mql4Syntax.mqh>
+#endif
+
+#ifndef __HASHMAP_MQH__
+#define __HASHMAP_MQH__
 
 #include "Collection.mqh"
 #include "HashSlots.mqh"
@@ -98,25 +105,86 @@ public:
 			}
 		}
 	}
-
-	int size() const { return m_entries.getRealSize(); }
-	bool isEmpty() const { return size() == 0; }
-	bool remove(Key key);
-	void clear();
-	bool contains(Key key) const {
+	MapIterator<Key, Value>* iterator() { return new HashMapIterator<Key, Value>(GetPointer(m_entries), GetPointer(m_slots), m_owned); }
+	inline int size() const { return m_entries.getRealSize(); }
+	inline bool isEmpty() const { return size() == 0; }
+	inline bool contains(Key key) const {
 		int ix = m_slots.lookupIndex(key);
 		return ix >= 0 && !m_entries.isRemoved(ix);
 	}
-
-	MapIterator<Key, Value>* iterator() { return new HashMapIterator<Key, Value>(GetPointer(m_entries), GetPointer(m_slots), m_owned); }
-
-	bool keys(Collection<Key>& col) const;
-	bool values(Collection<Value>& col) const;
-
 	Value operator[](Key key) const {
 		return get(key, NULL);
 	}
-
+	//+------------------------------------------------------------------+
+	//| If key actually removed returns true                             |
+	//+------------------------------------------------------------------+
+	bool remove(Key key) {
+		int ix = m_slots.lookupIndex(key);
+		if (ix == -1) return false;
+		// empty slot
+		if (m_entries.isRemoved(ix)) return false;
+		// delete possible pointers
+		SafeDelete(m_entries.getKey(ix));
+		if (m_owned) {
+			SafeDelete(m_entries.getValue(ix));
+		}
+		m_entries.remove(ix);
+		// if half of the keys is empty, then compact the storage
+		if (m_entries.shouldCompact()) {
+			Debug(StringFormat("should compact: real: %d, buffer: %d", m_entries.getRealSize(), m_entries.size()));
+			m_entries.compact();
+			m_slots.rehash();
+		}
+		return true;
+	}
+	//+------------------------------------------------------------------+
+	//| clear all entries and return to initial state                    |
+	//+------------------------------------------------------------------+
+	void clear() {
+		int s = m_entries.size();
+		for (int i = 0; i < s; i++) {
+			// delete possible pointers
+			if (!m_entries.isRemoved(i)) {
+				SafeDelete(m_entries.getKey(i));
+				if (m_owned) {
+					SafeDelete(m_entries.getValue(i));
+				}
+			}
+		}
+		m_entries.clear();
+		m_slots.initState();
+	}
+	//+------------------------------------------------------------------+
+	//| Get all keys                                                     |
+	//+------------------------------------------------------------------+
+	bool keys(Collection<Key>& col) const {
+		bool added = false;
+		int size = m_entries.size();
+		for (int i = 0; i < size; i++) {
+			if (!m_entries.isRemoved(i)) {
+				col.add(m_entries.getKey(i));
+				added = true;
+			}
+		}
+		return added;
+	}
+	//+------------------------------------------------------------------+
+	//| Get all values                                                   |
+	//+------------------------------------------------------------------+
+	bool values(Collection<Value>& col) const {
+		bool added = false;
+		int size = m_entries.size();
+		for (int i = 0; i < size; i++) {
+			if (!m_entries.isRemoved(i)) {
+				col.add(m_entries.getValue(i));
+				added = true;
+			}
+		}
+		return added;
+	}
+	//+------------------------------------------------------------------+
+	//| Get key value                                                    |
+	//+------------------------------------------------------------------+
 	Value get(Key key, Value def = NULL) const {
 		int ix = m_slots.lookupIndex(key);
 		if (ix >= 0 && !m_entries.isRemoved(ix))
@@ -124,168 +192,87 @@ public:
 		else
 			return def;
 	}
-
-	void set(Key key, Value value);
-	bool setIfExist(Key key, Value value);
-	bool setIfNotExist(Key key, Value value);
-
-	Value pop(Key key);
-};
-//+------------------------------------------------------------------+
-//| If key actually removed returns true                             |
-//+------------------------------------------------------------------+
-template <typename Key, typename Value>
-bool HashMap::remove(Key key) {
-	int ix = m_slots.lookupIndex(key);
-	if (ix == -1) return false;
-	// empty slot
-	if (m_entries.isRemoved(ix)) return false;
-	// delete possible pointers
-	SafeDelete(m_entries.getKey(ix));
-	if (m_owned) {
-		SafeDelete(m_entries.getValue(ix));
-	}
-	m_entries.remove(ix);
-	// if half of the keys is empty, then compact the storage
-	if (m_entries.shouldCompact()) {
-		Debug(StringFormat("should compact: real: %d, buffer: %d", m_entries.getRealSize(), m_entries.size()));
-		m_entries.compact();
-		m_slots.rehash();
-	}
-	return true;
-}
-//+------------------------------------------------------------------+
-//| only for pointers, returns NULL if key does not exist.           |
-//| For value types, use remove                                      |
-//+------------------------------------------------------------------+
-template <typename Key, typename Value>
-Value HashMap::pop(Key key) {
-	Value res = NULL;
-	int ix = m_slots.lookupIndex(key);
-	if (ix == -1) return res;
-	// empty slot
-	if (m_entries.isRemoved(ix)) return res;
-	// delete possible pointers
-	SafeDelete(m_entries.getKey(ix));
-	res = m_entries.getValue(ix);
-	m_entries.remove(ix);
-	// if half of the keys is empty, then compact the storage
-	if (m_entries.shouldCompact()) {
-		Debug(StringFormat("should compact: real: %d, buffer: %d", m_entries.getRealSize(), m_entries.size()));
-		m_entries.compact();
-		m_slots.rehash();
-	}
-	return res;
-}
-//+------------------------------------------------------------------+
-//| clear all entries and return to initial state                    |
-//+------------------------------------------------------------------+
-template <typename Key, typename Value>
-void HashMap::clear() {
-	int s = m_entries.size();
-	for (int i = 0; i < s; i++) {
-		// delete possible pointers
-		if (!m_entries.isRemoved(i)) {
-			SafeDelete(m_entries.getKey(i));
+	//+------------------------------------------------------------------+
+	//| Set key to value. Add key if it does not exist                   |
+	//+------------------------------------------------------------------+
+	void set(Key key, Value value) {
+		// we need to make sure that used slots is always smaller than
+		// certain percentage of total slots (m_htused <= (m_htsize*2)/3)
+		m_slots.upsize();
+		int i = m_slots.lookup(key);
+		int ix = m_slots[i];
+		if (ix == -1) {
+			m_slots.addSlot(i, m_entries.append(key, value));
+		} else if (m_entries.isRemoved(ix))
+			m_entries.unremove(ix, key, value);
+		else {
 			if (m_owned) {
-				SafeDelete(m_entries.getValue(i));
+				SafeDelete(m_entries.getValue(ix));
 			}
+			m_entries.setValue(ix, value);
 		}
 	}
-	m_entries.clear();
-	m_slots.initState();
-}
-//+------------------------------------------------------------------+
-//| Get all keys                                                     |
-//+------------------------------------------------------------------+
-template <typename Key, typename Value>
-bool HashMap::keys(Collection<Key>& col) const {
-	bool added = false;
-	int size = m_entries.size();
-	for (int i = 0; i < size; i++) {
-		if (!m_entries.isRemoved(i)) {
-			col.add(m_entries.getKey(i));
-			added = true;
+	//+------------------------------------------------------------------+
+	//| Set key to value only if key exists                              |
+	//+------------------------------------------------------------------+
+	bool setIfExist(Key key, Value value) {
+		// we need to make sure that used slots is always smaller than
+		// certain percentage of total slots (m_htused <= (m_htsize*2)/3)
+		m_slots.upsize();
+		int ix = m_slots.lookupIndex(key);
+		if (ix == -1) {
+			return false;
+		} else if (m_entries.isRemoved(ix))
+			return false;
+		else {
+			if (m_owned) {
+				SafeDelete(m_entries.getValue(ix));
+			}
+			m_entries.setValue(ix, value);
+			return true;
 		}
 	}
-	return added;
-}
-//+------------------------------------------------------------------+
-//| Get all values                                                   |
-//+------------------------------------------------------------------+
-template <typename Key, typename Value>
-bool HashMap::values(Collection<Value>& col) const {
-	bool added = false;
-	int size = m_entries.size();
-	for (int i = 0; i < size; i++) {
-		if (!m_entries.isRemoved(i)) {
-			col.add(m_entries.getValue(i));
-			added = true;
+	//+------------------------------------------------------------------+
+	//| Set key to value only if key does not exist                      |
+	//+------------------------------------------------------------------+
+	bool setIfNotExist(Key key, Value value) {
+		// we need to make sure that used slots is always smaller than
+		// certain percentage of total slots (m_htused <= (m_htsize*2)/3)
+		m_slots.upsize();
+		int i = m_slots.lookup(key);
+		int ix = m_slots[i];
+		if (ix == -1) {
+			m_slots.addSlot(i, m_entries.append(key, value));
+		} else if (m_entries.isRemoved(ix))
+			m_entries.unremove(ix, key, value);
+		else {
+			return false;
 		}
-	}
-	return added;
-}
-//+------------------------------------------------------------------+
-//| Set key to value. Add key if it does not exist                   |
-//+------------------------------------------------------------------+
-template <typename Key, typename Value>
-void HashMap::set(Key key, Value value) {
-	// we need to make sure that used slots is always smaller than
-	// certain percentage of total slots (m_htused <= (m_htsize*2)/3)
-	m_slots.upsize();
-	int i = m_slots.lookup(key);
-	int ix = m_slots[i];
-	if (ix == -1) {
-		m_slots.addSlot(i, m_entries.append(key, value));
-	} else if (m_entries.isRemoved(ix))
-		m_entries.unremove(ix, key, value);
-	else {
-		if (m_owned) {
-			SafeDelete(m_entries.getValue(ix));
-		}
-		m_entries.setValue(ix, value);
-	}
-}
-//+------------------------------------------------------------------+
-//| Set key to value only if key does not exist                      |
-//+------------------------------------------------------------------+
-template <typename Key, typename Value>
-bool HashMap::setIfNotExist(Key key, Value value) {
-	// we need to make sure that used slots is always smaller than
-	// certain percentage of total slots (m_htused <= (m_htsize*2)/3)
-	m_slots.upsize();
-	int i = m_slots.lookup(key);
-	int ix = m_slots[i];
-	if (ix == -1) {
-		m_slots.addSlot(i, m_entries.append(key, value));
-	} else if (m_entries.isRemoved(ix))
-		m_entries.unremove(ix, key, value);
-	else {
-		return false;
-	}
-	return true;
-}
-//+------------------------------------------------------------------+
-//| Set key to value only if key exists                              |
-//+------------------------------------------------------------------+
-template <typename Key, typename Value>
-bool HashMap::setIfExist(Key key, Value value) {
-	// we need to make sure that used slots is always smaller than
-	// certain percentage of total slots (m_htused <= (m_htsize*2)/3)
-	m_slots.upsize();
-	int ix = m_slots.lookupIndex(key);
-	if (ix == -1) {
-		return false;
-	} else if (m_entries.isRemoved(ix))
-		return false;
-	else {
-		if (m_owned) {
-			SafeDelete(m_entries.getValue(ix));
-		}
-		m_entries.setValue(ix, value);
 		return true;
 	}
-}
+	//+------------------------------------------------------------------+
+	//| Pop the value by key.                                            |
+	//+------------------------------------------------------------------+
+	Value pop(Key key) {
+		Value res = NULL;
+		int ix = m_slots.lookupIndex(key);
+		if (ix == -1) return res;
+		// empty slot
+		if (m_entries.isRemoved(ix)) return res;
+		// delete possible pointers
+		SafeDelete(m_entries.getKey(ix));
+		res = m_entries.getValue(ix);
+		m_entries.remove(ix);
+		// if half of the keys is empty, then compact the storage
+		if (m_entries.shouldCompact()) {
+			Debug(StringFormat("should compact: real: %d, buffer: %d", m_entries.getRealSize(), m_entries.size()));
+			m_entries.compact();
+			m_slots.rehash();
+		}
+		return res;
+	}
+};
+
 //+------------------------------------------------------------------+
 //| Iterator implementation for HashMap                              |
 //+------------------------------------------------------------------+
@@ -344,3 +331,5 @@ public:
 	}
 };
 //+------------------------------------------------------------------+
+
+#endif	// __HASHMAP_MQH__
