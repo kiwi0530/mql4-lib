@@ -1578,7 +1578,7 @@ int ArrayCopare(const void&, const void&, int, int, int);
 #define ArraySort() 0
 #define asin() 0
 #define atan() 0
-#define Bars() 0
+// #define Bars() 0
 #define BarsCalculated() 0
 #define ceil() 0
 #define ChartApplyTemplate() 0
@@ -1633,16 +1633,43 @@ int ArrayCopare(const void&, const void&, int, int, int);
 #define ColorToARGB() 0
 #define Comment() 0
 #define CopyBuffer() 0
-#define CopyClose() 0
-#define CopyHigh() 0
-#define CopyLow() 0
-#define CopyOpen() 0
-#define CopyRates() 0
+int CopyClose(string, ENUM_TIMEFRAMES, int, int, double);
+int CopyClose(string, ENUM_TIMEFRAMES, datetime, int, double);
+int CopyClose(string, ENUM_TIMEFRAMES, datetime, datetime, double);
+int CopyHigh(string, ENUM_TIMEFRAMES, int, int, double);
+int CopyHigh(string, ENUM_TIMEFRAMES, datetime, int, double);
+int CopyHigh(string, ENUM_TIMEFRAMES, datetime, datetime, double);
+int CopyLow(string, ENUM_TIMEFRAMES, int, int, double);
+int CopyLow(string, ENUM_TIMEFRAMES, datetime, int, double);
+int CopyLow(string, ENUM_TIMEFRAMES, datetime, datetime, double);
+int CopyOpen(string, ENUM_TIMEFRAMES, int, int, double);
+int CopyOpen(string, ENUM_TIMEFRAMES, datetime, int, double);
+int CopyOpen(string, ENUM_TIMEFRAMES, datetime, datetime, double);
+int CopyRates(string, ENUM_TIMEFRAMES, int, int, MqlRates*);
+int CopyRates(string, ENUM_TIMEFRAMES, datetime, int, MqlRates*);
+int CopyRates(string, ENUM_TIMEFRAMES, datetime, datetime, MqlRates*);
 #define CopyRealVolume() 0
 #define CopySpread() 0
 #define CopyTicks() 0
-#define CopyTickVolume() 0
-#define CopyTime() 0
+int CopyTickVolume(string, ENUM_TIMEFRAMES, int, int, long);
+int CopyTickVolume(string, ENUM_TIMEFRAMES, datetime, int, long);
+int CopyTickVolume(string, ENUM_TIMEFRAMES, datetime, datetime, long);
+int CopyTime(string, ENUM_TIMEFRAMES, int, int, datetime);
+int CopyTime(string, ENUM_TIMEFRAMES, datetime, int, datetime);
+int CopyTime(string, ENUM_TIMEFRAMES, datetime, datetime, datetime);
+bool RefreshRates();
+int Bars(string, ENUM_TIMEFRAMES);
+int Bars(string, ENUM_TIMEFRAMES, datetime, datetime);
+int iBars(string, int);
+int iBarShift(string, int, datetime, bool);
+double iOpen(string, int, int);
+double iClose(string, int, int);
+double iHigh(string, int, int);
+double iLow(string, int, int);
+int iHighest(string, int, int, int, int);
+int iLowest(string, int, int, int, int);
+datetime iTime(string, int, int);
+long iVolume(string, int, int);
 #define cos() 0
 #define CryptDecode() 0
 #define CryptEncode() 0
@@ -1701,7 +1728,7 @@ int ArrayCopare(const void&, const void&, int, int, int);
 #define FrameFirst() 0
 #define FrameInputs() 0
 #define FrameNext() 0
-#define GetLastError() 0
+int GetLastError();
 #define GetPointer() 0
 #define GetTickCount() 0
 #define GlobalVariableCheck() 0
@@ -1805,7 +1832,6 @@ int ArrayCopare(const void&, const void&, int, int, int);
 #define MessageBox() 0
 #define MQLInfoInteger() 0
 #define MQLInfoString() 0
-#define NormalizeDouble() 0
 #define ObjectCreate() 0
 #define ObjectDelete() 0
 #define ObjectFind() 0
@@ -1823,6 +1849,7 @@ int ArrayCopare(const void&, const void&, int, int, int);
 #define ObjectsTotal() 0
 #define ObjectSet() 0
 #define ObjectSetText() 0
+//
 #define OrderCalcMargin() 0
 #define OrderCalcProfit() 0
 #define OrderCheck() 0
@@ -1830,22 +1857,33 @@ int ArrayCopare(const void&, const void&, int, int, int);
 #define OrderGetInteger() 0
 #define OrderGetString() 0
 #define OrderGetTicket() 0
-#define OrderSelect() 0
-#define OrderSend() 0
+bool OrderSelect(int, int, int);
+int OrderSend(string, int, double, double, int, double, double, string, int, datetime, color);
 #define OrderSendAsync() 0
-#define OrderType() 0
-#define OrderTicket() 0
-#define OrderClose() 0
-#define OrderLots() 0
-#define OrderMagicNumber() 0
-#define OrderSymbol() 0
-#define OrderProfit() 0
-#define OrderSwap() 0
-#define OrderCommission() 0
-#define OrderClosePrice() 0
-#define OrderOpenPrice() 0
-#define OrdersTotal() 0
-#define OrdersHistoryTotal() 0
+double OrderStopLoss();
+int OrderType();
+int OrderTicket();
+bool OrderClose(int, double, double, int, color);
+bool OrderCloseBy(int, int, color);
+double OrderLots();
+int OrderMagicNumber();
+string OrderSymbol();
+double OrderProfit();
+double OrderTakeProfit();
+double OrderSwap();
+double OrderCommission();
+double OrderClosePrice();
+datetime OrderCloseTime();
+string OrderComment();
+double OrderOpenPrice();
+datetime OrderOpenTime();
+bool OrderDelete(int, color);
+datetime OrderExpiration();
+int OrdersTotal();
+int OrdersHistoryTotal();
+bool OrderModify(int, double, double, double, datetime, color);
+void OrderPrint();
+//
 #define ParameterGetRange() 0
 #define ParameterSetRange() 0
 #define Period() 0
@@ -1917,6 +1955,8 @@ bool StringToUpper(string&);
 string StringTrimLeft(const string);
 string StringTrimRight(const string);
 bool StringToLower(string&);
+//
+double NormalizeDouble(double, int);
 #define ShortArrayToString() 0
 #define ShortToString() 0
 #define IntegerToString() 0
@@ -1937,7 +1977,7 @@ bool StringToLower(string&);
 #define StrToInteger() 0
 #define StrToDouble() 0
 #define StructToTime() 0
-#define Symbol() 0
+string Symbol();
 #define SymbolInfoDouble() 0
 #define SymbolInfoInteger() 0
 #define SymbolInfoMarginRate() 0
