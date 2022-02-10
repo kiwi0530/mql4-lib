@@ -1940,7 +1940,7 @@ int StringBufferLen(int);
 int StringCompare(const string&, const string&, bool);
 string StringConcatenate(...);
 bool StringFill(string&, ushort);
-int StringFind(string, string, int);
+int StringFind(string, string, int start_pos = 0);
 ushort StringGetCharacter(string, int);
 ushort StringGetChar(string, int);
 string StringSetChar(string, int, ushort);

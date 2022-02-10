@@ -1,3 +1,5 @@
+/*
+ */
 //+------------------------------------------------------------------+
 //| Module: Trade/OrderManager.mqh                                   |
 //| This file is part of the mql4-lib project:                       |
@@ -195,7 +197,7 @@ int OrderManager::send(int cmd, double lots, double price, double stoploss, doub
 	if (ticket < 0) {
 		int err = Mql::getLastError();
 		m_lastError = err;
-		Alert(StringFormat(">>> Error OrderSend[%d]: %s", err, Mql::getErrorMessage(err)));
+		Alert(StringFormat(">>> Error OrderSend[%d]: %s", err, Mql::getErrorDescription(err)));
 	}
 
 	return ticket;
@@ -208,7 +210,7 @@ bool OrderManager::modify(int ticket, double stoploss, double takeprofit) {
 	if (!success) {
 		int err = Mql::getLastError();
 		m_lastError = err;
-		Alert(">>> Error modifying #", ticket, ": ", Mql::getErrorMessage(err));
+		Alert(">>> Error modifying #", ticket, ": ", Mql::getErrorDescription(err));
 	}
 	return success;
 }
@@ -222,7 +224,7 @@ bool OrderManager::modify(int ticket, int stoploss, int takeprofit) {
 	if (!Order::Select(ticket)) {
 		int err = Mql::getLastError();
 		m_lastError = err;
-		Alert(">>> Error modifying order with invalid ticket #", ticket, ": ", Mql::getErrorMessage(err));
+		Alert(">>> Error modifying order with invalid ticket #", ticket, ": ", Mql::getErrorDescription(err));
 		return false;
 	}
 	double sl = modifyStoploss ? Order::PPO(-stoploss) : Order::StopLoss();
@@ -238,7 +240,7 @@ bool OrderManager::modifyPending(int ticket, double price, datetime expiration) 
 		int err = Mql::getLastError();
 		m_lastError = err;
 		Alert(StringFormat(">>> Error modify pending order #%d[%s]: %s",
-						   ticket, err, Mql::getErrorMessage(err)));
+						   ticket, err, Mql::getErrorDescription(err)));
 	}
 	return success;
 }
@@ -250,7 +252,7 @@ bool OrderManager::closeCurrent(void) {
 		if (!OrderDelete(Order::Ticket(), m_closeColor)) {
 			int err = Mql::getLastError();
 			m_lastError = err;
-			Alert(">>> Error OrderDelete #", Order::Ticket(), ": ", Mql::getErrorMessage(err));
+			Alert(">>> Error OrderDelete #", Order::Ticket(), ": ", Mql::getErrorDescription(err));
 			return false;
 		}
 	} else {
@@ -258,7 +260,7 @@ bool OrderManager::closeCurrent(void) {
 		while (!OrderClose(Order::Ticket(), Order::Lots(), Order::E(), m_slippage, m_closeColor)) {
 			int err = Mql::getLastError();
 			m_lastError = err;
-			Alert(">>> Error OrderClose #", Order::Ticket(), ": ", Mql::getErrorMessage(err));
+			Alert(">>> Error OrderClose #", Order::Ticket(), ": ", Mql::getErrorDescription(err));
 			if ((err == ERR_REQUOTE || err == ERR_PRICE_CHANGED || err == ERR_OFF_QUOTES) && retry < m_retry) {
 				retry++;
 				Alert(">>> Retry OrderClose #", Order::Ticket());
@@ -276,7 +278,7 @@ bool OrderManager::close(int ticket) {
 	if (!Order::Select(ticket)) {
 		int err = Mql::getLastError();
 		m_lastError = err;
-		Alert(">>> Error closing order with invalid ticket #", ticket, ": ", Mql::getErrorMessage(err));
+		Alert(">>> Error closing order with invalid ticket #", ticket, ": ", Mql::getErrorDescription(err));
 		return false;
 	}
 	return closeCurrent();
@@ -287,13 +289,13 @@ bool OrderManager::close(int ticket) {
 bool OrderManager::closeCurrent(double lots) {
 	if (Order::IsPending()) {
 		Alert(">>> Use close() on pending order #", Order::Ticket());
-		m_lastError = ERR_NO_RESULT; // signal the failure
+		m_lastError = ERR_NO_RESULT;  // signal the failure
 		return false;
 	}
 	if (!OrderClose(Order::Ticket(), lots, Order::E(), m_slippage, m_closeColor)) {
 		int err = Mql::getLastError();
 		m_lastError = err;
-		Alert(">>> Error OrderClose #", Order::Ticket(), ": ", Mql::getErrorMessage(err));
+		Alert(">>> Error OrderClose #", Order::Ticket(), ": ", Mql::getErrorDescription(err));
 		return false;
 	}
 	return true;
@@ -305,7 +307,7 @@ bool OrderManager::close(int ticket, double lots) {
 	if (!Order::Select(ticket)) {
 		int err = Mql::getLastError();
 		m_lastError = err;
-		Alert(">>> Error closing order with invalid ticket #", ticket, ": ", Mql::getErrorMessage(err));
+		Alert(">>> Error closing order with invalid ticket #", ticket, ": ", Mql::getErrorDescription(err));
 		return false;
 	}
 	return closeCurrent(lots);

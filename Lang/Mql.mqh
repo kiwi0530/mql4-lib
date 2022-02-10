@@ -42,8 +42,38 @@
 class Mql {
 public:
 	static int getLastError() { return GetLastError(); }
-	static string getErrorMessage(int errorCode) { return GetErrorDescription(errorCode); }
-
+	static string getErrorDescription(int errorCode) { return GetErrorDescription(errorCode); }
+	static string getUninitReason(int reasonCode) {
+		string text = "";
+		//---
+		switch (reasonCode) {
+		case REASON_ACCOUNT:
+			text = "REASON_ACCOUNT, " + AccountInfoInteger(ACCOUNT_LOGIN);
+			break;
+		case REASON_CHARTCHANGE:
+			text = "REASON_CHARTCHANGE";
+			break;
+		case REASON_CHARTCLOSE:
+			text = "REASON_CHARTCLOSE";
+			break;
+		case REASON_PARAMETERS:
+			text = "REASON_PARAMETERS, " + MQLInfoString(MQL_PROGRAM_NAME);
+			break;
+		case REASON_RECOMPILE:
+			text = "REASON_RECOMPILE, " + MQLInfoString(MQL_PROGRAM_NAME);
+			break;
+		case REASON_REMOVE:
+			text = "REASON_REMOVE, " + MQLInfoString(MQL_PROGRAM_NAME);
+			break;
+		case REASON_TEMPLATE:
+			text = "REASON_TEMPLATE";
+			break;
+		default:
+			text = "Unsupported reason code " + reasonCode;
+		}
+		//---
+		return text;
+	}
 	//--- Prefer global DoubleToString function
 	static string doubleToString(double value, int precision) { return DoubleToString(value, precision); }
 	//--- Adapted from stdlib.mq4 by using `StringSetCharacter` instead of `StringSetChar`
@@ -88,6 +118,18 @@ public:
 
 	static string getProgramName() { return MQLInfoString(MQL_PROGRAM_NAME); }
 	static string getProgramPath() { return MQLInfoString(MQL_PROGRAM_PATH); }
+
+	static int MathRandInt(const int max, const int min = 0) {
+		int RAND_MAX = 32767;
+		int range = max - min;
+		if (range > RAND_MAX) range = RAND_MAX;
+		int randMin = RAND_MAX % range;
+		int rand;
+		do {
+			rand = MathRand();
+		} while (rand <= randMin);
+		return rand % range + min;
+	}
 
 	//mt4 will append wasteful string at expert window
 	static void printlog(const string in, const int length = 128) {

@@ -74,14 +74,17 @@ public:
 // #define __APP_NEW_false(_apptype) \
 // 	App::app = new _apptype();
 
-#define DECLARE_APP(_apptype)                                                      \
-	App* App::current_app = NULL;                                                  \
-	int OnInit() {                                                                 \
-		AppParamManager::setParamters();                                           \
-		if (!AppParamManager::app_param.check()) return INIT_PARAMETERS_INCORRECT; \
-		App::current_app = new _apptype(AppParamManager::app_param);               \
-		return App::current_app.__init__();                                        \
+#define DECLARE_APP(_apptype)                                                              \
+	App* App::current_app = NULL;                                                          \
+	int OnInit() {                                                                         \
+		AppParamManager::setParamters();                                                   \
+		if (!AppParamManager::app_param.check()) return INIT_PARAMETERS_INCORRECT;         \
+		App::current_app = new _apptype(AppParamManager::app_param);                       \
+		return App::current_app.__init__();                                                \
+	}                                                                                      \
+	void OnDeinit(const int reason) {                                                      \
+		NODE_LOG_INFO(StringFormat("App uninit reason=%s", Mql::getUninitReason(reason))); \
+		SafeDelete(App::current_app);                                                      \
 	}
-void OnDeinit(const int reason) { SafeDelete(App::current_app); }
 
 #endif	//__APP_MQH__

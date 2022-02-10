@@ -469,12 +469,12 @@ short GetAsyncKeyState(int nVirtKey);
 //+------------------------------------------------------------------+
 //| Get system defined error code message                            |
 //+------------------------------------------------------------------+
-string GetErrorMessage(int errorCode) {
-	static ushort buffer[64 * 1024];
-	FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				   0, errorCode, 0, buffer, ArraySize(buffer), 0);
-	return ShortArrayToString(buffer);
-}
+// string GetErrorMessage(int errorCode) {
+// 	static ushort buffer[64 * 1024];
+// 	FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+// 				   0, errorCode, 0, buffer, ArraySize(buffer), 0);
+// 	return ShortArrayToString(buffer);
+// }
 //+------------------------------------------------------------------+
 
 #endif	// __LANGWIN32_MQH__
