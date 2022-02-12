@@ -84,25 +84,25 @@ AppParamManagerBase* AppParamManagerBase::managers[];
 	_paramtype AppParamManager::app_param;
 
 //--- normal input parameter with declaration
-#define INPUT(_type, localname, inputname, defvalue)                                       \
-	class __Set##inputname : public AppParamManager {                                      \
-	public:                                                                                \
-		void set() { AppParamManager::app_param.set_##localname(AppInput##inputname); }    \
-		void get() { AppInput##inputname = AppParamManager::app_param.get_##localname(); } \
-	} __set##localname;                                                                    \
-	extern _type AppInput##inputname = defvalue
+#define INPUT(_type, localname, inputname, defvalue)                                \
+	class __Set##inputname : public AppParamManager {                               \
+	public:                                                                         \
+		void set() { AppParamManager::app_param.set_##localname(I##inputname); }    \
+		void get() { I##inputname = AppParamManager::app_param.get_##localname(); } \
+	} __set##localname;                                                             \
+	extern _type I##inputname = defvalue
 
-#define INPUT_READONLY(_type, localname, inputname, defvalue)                           \
-	class __Set##inputname : public AppParamManager {                                   \
-	public:                                                                             \
-		void set() { AppParamManager::app_param.set_##localname(AppInput##inputname); } \
-		void get() {}                                                                   \
-	} __set##localname;                                                                 \
-	extern _type AppInput##inputname = defvalue
+#define INPUT_READONLY(_type, localname, inputname, defvalue)                    \
+	class __Set##inputname : public AppParamManager {                            \
+	public:                                                                      \
+		void set() { AppParamManager::app_param.set_##localname(I##inputname); } \
+		void get() {}                                                            \
+	} __set##localname;                                                          \
+	extern _type I##inputname = defvalue
 
 //--- Input separator
 #define INPUT_SEP(name, content) \
-	input string AppInput##name = "||----- " #content " -----||"
+	input string I##name = "||----- " #content " -----||"
 
 //--- Input separator
 // #define FIXED_INPUT_SEP(name)

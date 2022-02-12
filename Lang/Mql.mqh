@@ -47,6 +47,9 @@ public:
 		string text = "";
 		//---
 		switch (reasonCode) {
+		case 0:
+			text = "SUCCESS";
+			break;
 		case REASON_ACCOUNT:
 			text = "REASON_ACCOUNT, " + AccountInfoInteger(ACCOUNT_LOGIN);
 			break;
