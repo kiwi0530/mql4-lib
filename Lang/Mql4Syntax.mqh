@@ -29,6 +29,13 @@ struct MqlRates {
 	int spread;		   // Spread
 	long real_volume;  // Trade volume
 };
+struct MqlTick {
+	datetime time;	// Time of the last prices update
+	double bid;		// Current Bid price
+	double ask;		// Current Ask price
+	double last;	// Price of the last deal (Last)
+	ulong volume;	// Volume for the current Last price
+};
 //
 #define __DATE__ 0
 #define __DATETIME__ 0

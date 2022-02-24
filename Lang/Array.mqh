@@ -20,6 +20,9 @@
 //| See the License for the specific language governing permissions  |
 //| and limitations under the License.                               |
 //+------------------------------------------------------------------+
+#ifndef __ARRAY_MQH__
+#define __ARRAY_MQH__
+
 #property strict
 //+------------------------------------------------------------------+
 //| Generic array insert                                             |
@@ -197,7 +200,7 @@ public:
 	void removeAt(int index) { ArrayDelete(m_array, index); }
 	int removeAll(const T value) { return ArrayDeleteAll(m_array, value); }
 	int removeBatch(const int& removed[]) { return ArrayBatchRemove(m_array, removed); }
-	void push(T value) { insertAt(size() - 1, value); }
+	void push(T value) { insertAt(size() == 0 ? 0 : size() - 1, value); }
 	int index(const T value) const;
 };
 //+------------------------------------------------------------------+
@@ -228,3 +231,5 @@ int Array::index(const T value) const {
 	return index;
 }
 //+------------------------------------------------------------------+
+
+#endif	// __ARRAY_MQH__

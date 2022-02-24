@@ -49,7 +49,10 @@
 #define uintptr_t uint
 #define size_t int
 #endif
-
+// for tester: all import dll must put in "DataFolder" with terminal.exe, terminal require restart. not "tester" folder
+// must check Options -> Expert Advisors -> Allow DLL Imports
+// for 32 bit mt4, get a genuine 32 bit dll from a legit source (like windll.com), not from anyone who told you to download
+// for 64 bit mt5, copy from Windows/System32
 #import "kernel32.dll"
 void RtlMoveMemory(intptr_t dest, const uchar &array[], size_t length);
 void RtlMoveMemory(uchar &array[], intptr_t src, size_t length);
