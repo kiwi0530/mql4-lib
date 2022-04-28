@@ -1,12 +1,6 @@
 /*
- * File Created: Sunday, 6th February 2022 10:38:00 am
- * Author: Kiwi (kiwi0530@gmail.com)
- * -----
- * Copyright 2012 - 2024 DataTech (Kevin Lee)Kiwi<kiwi0530@mail.com>
- * Unauthorized copying of this file and/or their product, via any medium is strictly prohibited
- * Proprietary and confidential
  */
-//unsupported keyword
+// unsupported keyword
 #define input
 #define interface class
 //

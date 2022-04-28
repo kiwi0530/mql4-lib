@@ -1,24 +1,24 @@
 /*
  * mt4syntax define those not defined in both mt5 or c++
  */
-//anyway common/mql4/5syntax are fake
+// anyway common/mql4/5syntax are fake
 #include <stdio.h>
 #include "CommonMqlSyntax.mqh"
 
 #include "InitMQL4Declares.mqh"
 
-//wrong definition
-// #define INIT_FAILED 0
-// #define INIT_SUCCEEDED 0
-// #define INIT_AGENT_NOT_SUITABLE 0
-// #define INIT_PARAMETERS_INCORRECT 0
+// wrong definition
+//  #define INIT_FAILED 0
+//  #define INIT_SUCCEEDED 0
+//  #define INIT_AGENT_NOT_SUITABLE 0
+//  #define INIT_PARAMETERS_INCORRECT 0
 enum ENUM_INIT_RETCODE {
 	INIT_SUCCEEDED = 0,
 	INIT_FAILED = 1,
 	INIT_PARAMETERS_INCORRECT = 2,
 	INIT_AGENT_NOT_SUITABLE = 3
 };
-//structs
+// structs
 struct MqlRates {
 	datetime time;	   // Period start time
 	double open;	   // Open price

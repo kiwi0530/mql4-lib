@@ -7,19 +7,19 @@
 //+-------------------------------------------------------------------+
 // initmql4 is real in compare to MT5, but it also have declarative effect
 // do not include this file in MT4 __MQLBUILD__ environment or will fail
-//https://www.mql5.com/en/forum/135535
+// https://www.mql5.com/en/forum/135535
 #ifdef __MQLBUILD__
 #property copyright "keiji"
 #property copyright "DC2008"
 #property link "https://www.mql5.com"
 #endif
 //--- Declaration of constants
-#define OP_BUY 0		//Buy
-#define OP_SELL 1		//Sell
-#define OP_BUYLIMIT 2	//Pending order of BUY LIMIT type
-#define OP_SELLLIMIT 3	//Pending order of SELL LIMIT type
-#define OP_BUYSTOP 4	//Pending order of BUY STOP type
-#define OP_SELLSTOP 5	//Pending order of SELL STOP type
+#define OP_BUY 0		// Buy
+#define OP_SELL 1		// Sell
+#define OP_BUYLIMIT 2	// Pending order of BUY LIMIT type
+#define OP_SELLLIMIT 3	// Pending order of SELL LIMIT type
+#define OP_BUYSTOP 4	// Pending order of BUY STOP type
+#define OP_SELLSTOP 5	// Pending order of SELL STOP type
 //---
 #define MODE_OPEN 0
 #define MODE_CLOSE 3
@@ -72,7 +72,7 @@
 #define EMPTY -1
 #define FALSE false
 #define TRUE true
-//predefined vars
+// predefined vars
 int _Digits;
 double _Point;
 int _LastError;

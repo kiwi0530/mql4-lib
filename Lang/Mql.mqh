@@ -71,6 +71,9 @@ public:
 		case REASON_TEMPLATE:
 			text = "REASON_TEMPLATE";
 			break;
+		case REASON_INITFAILED:
+			text = "REASON_INITFAILED, see log";
+			break;
 		default:
 			text = "Unsupported reason code " + reasonCode;
 		}
@@ -134,8 +137,8 @@ public:
 		return rand % range + min;
 	}
 
-	//mt4 will append wasteful string at expert window
-	static void printlog(const string in, const int length = 128) {
+	// mt4 will append wasteful string at expert window
+	static void printlog(const string in, const int length = 116) {
 		string tmp = in;
 		if (StringLen(tmp) > length) {
 			while (StringLen(tmp) > 0) {
@@ -157,6 +160,26 @@ public:
 
 		PostMessageA(hWnd, WM_COMMAND, EA_KILL, 0);
 		return;
+	}
+	static string datafolder_path() {
+		string result = "";
+		string program_path = MQLInfoString(MQL_PROGRAM_PATH);
+		string buf[];
+		int ret = StringSplit(program_path, '\\', buf);
+		if (ret > 0 && (ArraySize(buf) - 3 >= 0)) {
+			for (int i = 0; i < ArraySize(buf) - 3; i++)
+				result = result + buf[i] + "\\";
+		}
+		return result;
+	}
+	static string datafolder_name() {
+		string program_path = MQLInfoString(MQL_PROGRAM_PATH);
+		string buf[];
+		int ret = StringSplit(program_path, '\\', buf);
+		if (ret > 0 && (ArraySize(buf) - 4 >= 0)) {
+			return buf[ArraySize(buf) - 4];
+		}
+		return "";
 	}
 };
 
@@ -221,7 +244,7 @@ protected:                                                         \
 //| Use *Read or *Write versions for read only or write only         |
 //| properties                                                       |
 //+------------------------------------------------------------------+
-//Leave these macro for its compatiblity
+// Leave these macro for its compatiblity
 #define ObjectAttr(Type, Private, Public)                 \
 public:                                                   \
 	Type get##Public() const { return m_##Private; }      \

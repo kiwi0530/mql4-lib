@@ -46,7 +46,7 @@ protected:
 	int getDeinitReason() const { return UninitializeReason(); }
 	// bool isRuntimeControlled() const { return m_runtimeControlled; }
 
-	//compatibility
+	// compatibility
 	void fail(string message = "", ENUM_INIT_RETCODE ret = ENUM_INIT_RETCODE::INIT_FAILED) {
 		if (message != "") Alert(message);
 		m_ret = ret;
@@ -83,7 +83,7 @@ public:
 		return App::current_app.__init__();                                                \
 	}                                                                                      \
 	void OnDeinit(const int reason) {                                                      \
-		NODE_LOG_INFO(StringFormat("App uninit reason=%s", Mql::getUninitReason(reason))); \
+		Mql::printlog(StringFormat("App uninit reason=%s", Mql::getUninitReason(reason))); \
 		SafeDelete(App::current_app);                                                      \
 	}
 

@@ -354,20 +354,20 @@ public:
 			unichar cc = (unichar)-1;
 			c = m_stream.nextChar();
 
-			if (c == '"') // end of string
+			if (c == '"')  // end of string
 			{
 				value = ShortArrayToString(carray);
 				return new JsonString(value);
 			}
-			if (c == '\\') // escape
+			if (c == '\\')	// escape
 			{
 				if (!parseEscape(cc)) {
 					return NULL;
 				}
-			} else if (c >= 0x0020 && c <= 0x10ffff) // normal character
+			} else if (c >= 0x0020 && c <= 0x10ffff)  // normal character
 			{
 				cc = c;
-			} else // !!!
+			} else	// !!!
 			{
 				m_error = "Invaid character encountered";
 				return NULL;
@@ -407,7 +407,7 @@ public:
 		case 't':
 			value = '\t';
 			return true;
-		case 'u': // four hex digits
+		case 'u':  // four hex digits
 		{
 			value = 0;
 			for (int i = 0; i < 4; i++) {
@@ -466,11 +466,11 @@ public:
 			c = m_stream.nextChar();
 		}
 		value = 0;
-		if (c == '0') // 0
+		if (c == '0')  // 0
 		{
 			sign = 1;
 			return true;
-		} else if (c <= '9' && c >= '1') // onenine 0..9
+		} else if (c <= '9' && c >= '1')  // onenine 0..9
 		{
 			do {
 				value *= 10;
@@ -506,11 +506,11 @@ public:
 		unichar c = m_stream.nextChar();
 
 		if (c != 'E' && c != 'e') {
-			m_stream.pushChar(c); // match ""
+			m_stream.pushChar(c);  // match ""
 			return true;
 		}
 		c = m_stream.nextChar();
-		if (c == '+' || c == '-') // match + -
+		if (c == '+' || c == '-')  // match + -
 		{
 			sign = (c == '-') ? -1 : 1;
 			c = m_stream.nextChar();
@@ -617,13 +617,13 @@ public:
 		unichar c = m_stream.nextChar();
 		m_stream.pushChar(c);
 		switch (c) {
-		case '"': // string
+		case '"':  // string
 			return parseString();
-		case '[': // array
+		case '[':  // array
 			return parseArray();
-		case '{': // object
+		case '{':  // object
 			return parseObject();
-		case 't': // true
+		case 't':  // true
 		{
 			if (skipLiteral(LIT_TRUE))
 				return new JsonBoolean(true);
@@ -632,7 +632,7 @@ public:
 				return NULL;
 			}
 		}
-		case 'f': // false
+		case 'f':  // false
 		{
 			if (skipLiteral(LIT_FALSE))
 				return new JsonBoolean(false);
@@ -641,7 +641,7 @@ public:
 				return NULL;
 			}
 		}
-		case 'n': // null
+		case 'n':  // null
 		{
 			if (skipLiteral(LIT_NULL))
 				return null;

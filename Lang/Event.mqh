@@ -33,11 +33,11 @@ from its onAppEvent event handler:
    #include <WinUser32.mqh>
    #include <MQL4/Lang/Event.mqh>
    bool SendAppEvent(int hwnd,ushort event,uint param)
-     {
-      int wparam, lparam;
-      EncodeKeydownMessage(event, param, wparam, lparam);
-      return PostMessageW(hwnd,WM_KEYDOWN,wparam, lparam) != 0;
-     }
+	 {
+	  int wparam, lparam;
+	  EncodeKeydownMessage(event, param, wparam, lparam);
+	  return PostMessageW(hwnd,WM_KEYDOWN,wparam, lparam) != 0;
+	 }
 
 The mechanism uses a custom WM_KEYDOWN message to trigger the OnChartEvent.
 In OnChartEvent handler, EventApp checks if KeyDown event is actually

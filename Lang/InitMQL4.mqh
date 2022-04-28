@@ -7,7 +7,7 @@
 //+-------------------------------------------------------------------+
 // initmql4 is real in compare to MT5, but it also have declarative effect
 // do not include this file in MT4 __MQLBUILD__ environment or will fail
-//https://www.mql5.com/en/forum/135535
+// https://www.mql5.com/en/forum/135535
 #ifdef __MQLBUILD__
 #property copyright "keiji"
 #property copyright "DC2008"

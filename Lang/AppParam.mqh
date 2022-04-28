@@ -63,8 +63,8 @@ public:
 	}
 	// static int getNumberOfParameters() { return ArraySize(managers); }
 
-	virtual void set() = 0;	 //set read input to AppParam
-	virtual void get() = 0;	 //get update AppParam current value to input
+	virtual void set() = 0;	 // set read input to AppParam
+	virtual void get() = 0;	 // get update AppParam current value to input
 };
 AppParamManagerBase* AppParamManagerBase::managers[];
 
