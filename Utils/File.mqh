@@ -150,8 +150,12 @@ public:
    bool              readBool() const {return FileReadBool(m_handle);}
 
    uint              writeString(string value) {return FileWriteString(m_handle,value);}
-   uint              writeDateTime(datetime value) {return FileWriteString(m_handle,TimeToString(value));}
+   /** flags (use one or combine with pipes): TIME_DATE | TIME_MINUTES | TIME_SECONDS */
+   uint              writeDateTime(datetime value, int modeFlags=TIME_DATE|TIME_SECONDS) {return FileWriteString(m_handle,TimeToString(value, modeFlags));}
+   /** DEPRECATED: Use writeDouble() instead. */
    uint              writeNumber(double value) {return FileWriteString(m_handle,DoubleToString(value,8));}
+   /** Write a decimal number; optionally, give the number of digits (will round the value). */
+   uint              writeDouble(double value, int digits=8) {return FileWriteString(m_handle,DoubleToString(value,digits));}
    uint              writeInteger(int value) {return FileWriteString(m_handle,IntegerToString(value));}
    uint              writeBool(bool value) {return FileWriteString(m_handle,value?"true":"false");}
 
