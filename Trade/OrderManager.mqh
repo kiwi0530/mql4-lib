@@ -82,6 +82,14 @@ public:
 		m_color[1] = clrRed;
 	}
 
+  // Copy constructor
+	OrderManager(OrderManager& o)
+  	  : s(o.s), MINLOT(o.MINLOT), POINT(o.POINT), STOPLEVEL(o.STOPLEVEL), m_magic(o.m_magic), m_slippage(o.m_slippage)
+	    , m_lastError(o.m_lastError), m_closeColor(o.m_closeColor) {
+	  m_color[0] = o.m_color[0];
+	  m_color[1] = o.m_color[1];
+  }
+
 	static bool IsTradeAllowed(void) {
 		if (!Terminal::isTradeAllowed()) {
 			Alert(">>> Error: please allow EA trading in Terminal settings!");
