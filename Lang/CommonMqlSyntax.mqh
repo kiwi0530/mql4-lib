@@ -1,4 +1,6 @@
 /*
+ * NOTE! These syntax files are actually NEVER included in the build: They are only used in
+ *  preprocessor guards and used to provide IDE completions (VSCode, IntelliJ,...).
  */
 // unsupported keyword
 #define input
