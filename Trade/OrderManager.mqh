@@ -31,7 +31,6 @@
 //| OrderManager wraps order sending/modification/closing functions  |
 //+------------------------------------------------------------------+
 class OrderManager {
-	ObjectAttr(int, magic, Magic);
 	ObjectAttr(int, slippage, Slippage);
 	ObjectAttr(color, closeColor, CloseColor);
 	// number of retries when price change/requote happens
@@ -74,7 +73,6 @@ public:
 		  MINLOT(SymbolInfoDouble(symbol, SYMBOL_VOLUME_MIN)),
 		  POINT(SymbolInfoDouble(symbol, SYMBOL_POINT)),
 		  STOPLEVEL((int)SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL)),
-		  m_magic(0),
 		  m_slippage(3),
 		  m_lastError(0),
 		  m_closeColor(clrWhite) {
@@ -84,7 +82,7 @@ public:
 
   // Copy constructor
 	OrderManager(OrderManager& o)
-  	  : s(o.s), MINLOT(o.MINLOT), POINT(o.POINT), STOPLEVEL(o.STOPLEVEL), m_magic(o.m_magic), m_slippage(o.m_slippage)
+  	  : s(o.s), MINLOT(o.MINLOT), POINT(o.POINT), STOPLEVEL(o.STOPLEVEL), m_slippage(o.m_slippage)
 	    , m_lastError(o.m_lastError), m_closeColor(o.m_closeColor) {
 	  m_color[0] = o.m_color[0];
 	  m_color[1] = o.m_color[1];
@@ -114,19 +112,22 @@ public:
 		return true;
 	}
 
-	//--- Order opening
-	int send(int cmd, double lots, double price, double stoploss, double takeprofit, string comment = NULL);
-	int send(int cmd, double lots, double price, int stoploss, int takeprofit, string comment = NULL) {
+	//--- Order opening (you can also use the user-friendly `market()` / `pend()` for market/limit orders)
+	int send(int cmd, double lots, double price, double stoploss, double takeprofit, string comment = NULL, int magic = 0,
+	    datetime expiration = 0);
+	/** Variant of `send()` that accepts SL/TP in points instead of a price. */
+	int send(int cmd, double lots, double price, int stoploss, int takeprofit, string comment = NULL, int magic = 0,
+	    datetime expiration = 0) {
 		double sl = stoploss > 0 ? OrderBase::PP(s, cmd, price, -stoploss) : 0.0;
 		double tp = takeprofit > 0 ? OrderBase::PP(s, cmd, price, takeprofit) : 0.0;
-		return send(cmd, lots, price, sl, tp, comment);
+		return send(cmd, lots, price, sl, tp, comment, magic, expiration);
 	}
 	// market order T=double|int op=OP_BUY|OP_SELL
 	template <typename T>
-	int market(int op, double lots, T stoploss, T takeprofit, string comment = NULL) {
+	int market(int op, double lots, T stoploss, T takeprofit, string comment = NULL, int magic = 0) {
 		int retry = 0;
 		int ticket = 0;
-		while ((ticket = send(op, lots, OrderBase::S(s, op), stoploss, takeprofit, comment)) < 0) {
+		while ((ticket = send(op, lots, OrderBase::S(s, op), stoploss, takeprofit, comment, magic)) < 0) {
 			if ((m_lastError == ERR_REQUOTE || m_lastError == ERR_PRICE_CHANGED || m_lastError == ERR_OFF_QUOTES) && retry < m_retry) {
 				retry++;
 				Alert(">>> Reopen order");
@@ -138,9 +139,10 @@ public:
 	}
 	// pending order T=double|int op=OP_BUY|OP_SELL
 	template <typename T>
-	int pend(int op, double price, double lots, T stoploss, T takeprofit, string comment = NULL) {
+	int pend(int op, double price, double lots, T stoploss, T takeprofit, string comment = NULL, int magic = 0,
+	    datetime expiration = 0) {
 		double p = OrderBase::N(s, price);
-		return send(deducePendType(op, p), lots, p, stoploss, takeprofit, comment);
+		return send(deducePendType(op, p), lots, p, stoploss, takeprofit, comment, magic, expiration);
 	}
 
 	// aliases for easier using
@@ -196,12 +198,13 @@ int OrderManager::deducePendType(int op, double price) {
 //| Takes care of normaling lots and prices                          |
 //| Internal use only. `price` parameter should always be normalized |
 //+------------------------------------------------------------------+
-int OrderManager::send(int cmd, double lots, double price, double stoploss, double takeprofit, string comment = NULL) {
+int OrderManager::send(int cmd, double lots, double price, double stoploss, double takeprofit, string comment = NULL,
+    int magic = 0, datetime expiration = 0) {
 	int ticket = OrderSend(s, cmd, Math::roundUpToMultiple(lots, MINLOT),
 						   price, m_slippage,
 						   OrderBase::N(s, stoploss),
 						   OrderBase::N(s, takeprofit),
-						   comment, m_magic, 0, m_color[cmd & 1]);
+						   comment, magic, expiration, m_color[cmd & 1]);
 	if (ticket < 0) {
 		int err = Mql::getLastError();
 		m_lastError = err;
